@@ -194,6 +194,15 @@ server {
 
 
 
+# Nginx
+настройки, см закрытую заметку
+```
+    fail_timeout 60s;
+    request_terminate_timeout 300;
+    max_execution_time 300;
+```
+
+
 
 Nginx dev
 
