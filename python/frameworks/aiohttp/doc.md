@@ -7,6 +7,8 @@
 **Слышал об алгебраических эффектах?**
 - https://overreacted.io/algebraic-effects-for-the-rest-of-us/
 - https://docs.python.org/3/library/asyncio-task.html#creating-tasks
+
+
 **Async aio не умеет по умолчанию делать асинхронные запросы к бд
 Нужны спец драйверы например, asynpg
 async postgres
