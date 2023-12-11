@@ -1,0 +1,30 @@
+### OSX ###
+**/.DS_Store
+
+# Icon must end with two \r
+Icon
+
+#*.sql
+#*.log
+#*.icloud
+.idea/
+#.benchmarks
+#*env/
+#*EXPERIMENTS*
+#
+## Python
+#__pycache__/
+#*.py[cod]
+#*.pyc
+#*.vscode
+#
+## scripts
+#/bin/
+#/dev_db_fixture.json
+#docker-compose.yml
+#env
+#env.dev
+#/dump.rdb
+##Makefile
+#Dockerfile.dev
+#entrypoint-web.sh
