@@ -39,3 +39,12 @@ check2 = "type" in jf and jf["type"] in ["photo"] and "standalone" in jf and jf[
 
 if not "values" in card or card["values"] is None:
     continue
+
+
+
+
+FromBackgroundTaskRu = dict(map(lambda line: (line[1], line[0]), BackgroundTaskTypeRu.items()))
+
+FromTypesRu = dict(map(lambda line: (line[1], line[0]), TypesRu.items()))
+# почему не так?
+FromTypesRu = {v:k for k,v TypesRu.items()}
