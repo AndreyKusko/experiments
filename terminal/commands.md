@@ -9,6 +9,7 @@
 ### Сменить пароль  linux
 - https://losst.ru/kak-smenit-parol-v-linux
 
+
 ### Копирование файлов с одной машины, на другую
 
 Я обычно юзаю **CyberDuck** или **Git**
