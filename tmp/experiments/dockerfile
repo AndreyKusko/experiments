@@ -1,0 +1,30 @@
+
+## пример переменных в докере
+#ARG APP_NAME=helpdesk
+## пример использования
+#RUN mkdir -p /usr/src/$APP_NAME
+
+
+COPY requirements.txt .
+
+
+# RUN mkdir -p /root/.ssh && \
+#     chmod 0700 /root/.ssh
+# # COPY known_hosts > /root/.ssh/known_hosts
+# RUN  echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
+# RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
+#     echo "$ssh_pub_key" > /root/.ssh/id_rsa.pub && \
+#     chmod 600 /root/.ssh/id_rsa && \
+#     chmod 600 /root/.ssh/id_rsa.pub
+
+# RUN mkdir -p /root/.ssh
+# ADD id_rsa /root/.ssh/id_rsa
+# RUN chmod 700 /root/.ssh/id_rsa
+# RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
+
+# cat ~/.ssh/id_rsa.pub
+# glpat-ZXgEDKFym4zGF6sLKm9J
+# pip install -e git+ssh://AndreyKusko:glpat-ZXgEDKFym4zGF6sLKm9J@gitlab.com/AndreyKusko/django_tool_box.git#egg=django_tool_box
+# pip install -e git+ssh://deployer:glpat-ZXgEDKFym4zGF6sLKm9J@gitlab.com/AndreyKusko/django_tool_box.git#egg=django_tool_box
+# pip install -e git+https://deployer:glpat-ZXgEDKFym4zGF6sLKm9J@gitlab.com/AndreyKusko/django_tool_box.git#egg=django_tool_box
+# pip install -e git+ssh://git@gitlab.com/AndreyKusko/django_tool_box.git#egg=django_tool_box
