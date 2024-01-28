@@ -199,3 +199,9 @@ DATABASES = { 'default': { 'ENGINE': 'django.db.backends.postgresql_psycopg2', '
 **THE SOLUTION!**
     docker run --rm -p 5000:5000 -e SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@host.docker.internal:5432/kaba kaba:v0.1
 
+
+нет смысла в обеих настройках дщсфдрщые и другой, можно использовать какую-то одну
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # DATABASE_URI=postgresql://postgres:postgres@host.docker.internal:5432/vpn_bot_stage
+      - "localhost:host-gateway"            # DATABASE_URI=postgresql://postgres:postgres@localhost:5432/vpn_bot_stage

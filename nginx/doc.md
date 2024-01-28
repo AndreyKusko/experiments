@@ -1,9 +1,30 @@
 # Nginx
 
-
 sudo nginx -t && sudo service nginx restart
 cd /etc/nginx/sites-available
 sudo nano /etc/nginx/nginx.conf
+
+
+
+sudo systemctl stop nginx
+Чтобы запустить остановленный веб-сервер, введите:
+
+sudo systemctl start nginx
+Чтобы остановить и снова запустить службу, введите:
+
+sudo systemctl restart nginx
+Если вы просто вносите изменения в конфигурацию, во многих случаях Nginx может перезагружаться без отключения соединений. Для этого введите:
+
+sudo systemctl reload nginx
+По умолчанию Nginx настроен на автоматический запуск при загрузке сервера. Если вы не хотите этого, вы можете отключить такое поведение с помощью следующей команды:
+
+sudo systemctl disable nginx
+Чтобы перезагрузить службу для запуска во время загрузки, введите:
+
+sudo systemctl enable nginx
+
+
+
 
 
 
@@ -406,3 +427,8 @@ server {
         proxy_pass http://auth/api/v1/users/instances;
     }
 }
+
+
+
+
+
