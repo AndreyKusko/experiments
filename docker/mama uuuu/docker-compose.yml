@@ -1,0 +1,612 @@
+version: "3"
+services:
+  
+  rabbitmq:
+    image: rabbitmq:management
+    command: rabbitmq-server
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - ./volumes/redis:/data
+      
+  stage:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/ma-saas-stage:latest
+    restart: on-failure
+    command: >
+      bash -c "./manage.py runserver 0.0.0.0:8113"
+    ports:
+      - "127.0.0.1:8113:8113"
+    environment:
+      DEBUG: 1
+      SECRET_KEY: "dvjkashfjdfksagbhvasbvc32424"
+      BASE_URL: "http://stage.ma.direct/"
+      DATABASE_URI_SAAS: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/saas-stage?sslmode=verify-full&sslrootcert=/opt/root.crt      
+      DATABASE_URI_BILLING: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/billing-stage?sslmode=verify-full&sslrootcert=/opt/root.crt
+      REDIS_URI_POLICIES: redis://redis:6379/2 # redis://192.168.1.5:6379/2
+      CELERY_BROKER_URL: redis://redis:6379/3 # redis://192.168.1.5:6379/3
+      BILLING_HOST: "billing-stage:9090"
+      MEDIA_STORE: "http://136.243.147.54:10999/?ID_REQUEST_HOST=https://files.ma.direct&MEDIA_SECRET_KEY=0e83c8a58b9c0ba01f875f3d93d54e48&PUBLIC_LINK_SECRET_KEY=e0913df826d9a8560a9d5acacad6602d"
+      OBJ_STORE_HOST: "https://files.ma.direct"
+      SERVER_ENVIRONMENT: "stage"
+      SENTRY_URL: "https://6d83ca3f56a24a88add943b9b4c4257d@sentry.millionagents.com/8"
+      # SENTRY_URL: "https://841d30eb4c79426ca75d6474f03cd4dc@o482898.ingest.sentry.io/5533816"
+      SERVICE_DOMAIN: "stage.ma.direct"
+      REALMROUTERSERV_HOST: "https://realmrouterserv.millionagents.com/proceed_request/"
+      REALMROUTERSERV_AUTH_TOKEN: "f642240c77d884ef86a50715748fbadc278f60dc9d7dd23d9b04aba10839baa2"
+      LOGGER_SERV_LINK: "http://84.201.142.101/api/v1/log"
+      LOGGER_AUTH_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoxLCJyZWFsbSI6MX0.z3t6x0mSGrG60rQ8-nuFp3CzUP-b6C3PumzwruQ-sVE"
+      # YANDEX_GEOCODER_API_KEY: "22c17acd-f947-4bf6-b5e1-f2074a028453"
+      # YANDEX_GEOCODER_API_KEY: "40c52364-31a1-4c26-a02e-b01613935f08"
+      YANDEX_GEOCODER_API_KEY: "10ab9964-e85b-460c-a0d7-c96784fc9f5b"
+      REQUISITES: "https://requisitesdev.millionagents.com?AUTH_TOKEN=3ca3706923c5b4ead7810d36fea31feb32682117"
+      REQUISITES_HOST: "https://requisitesdev.millionagents.com"
+      REQUISITES_AUTH_TOKEN: "3ca3706923c5b4ead7810d36fea31feb32682117"
+
+      DOCSHUB_HOST: "https://docshub.millionagents.com" # удалить
+      DOCSHUB_AUTH_TOKEN: "01e437fee006d88f656041fdbd6b57abad6cf26c" # удалить
+      DOCSHUB: "https://docshub.millionagents.com?AUTH_TOKEN=01e437fee006d88f656041fdbd6b57abad6cf26c"
+      
+      POLICIESSERV_HOST: "https://policiesstage.ma.direct"
+      POLICIESSERV_TOKEN: "fac00e479d7999b8d5927a9485149aff6d7e93e43cc5e6c95506496a25446171"
+      POLICIESSERV: "https://policiesstage.ma.direct?AUTH_TOKEN=fac00e479d7999b8d5927a9485149aff6d7e93e43cc5e6c95506496a25446171"
+    
+      DNSMADEEASY_API_KEY: "90e77278-38c1-4c61-a802-364d8c162852"
+      DNSMADEEASY_SECRET_KEY: "e7bf6065-a493-4c49-b88f-d4fccb478c29"
+      DNSMADEEASY_URL: "https://api.dnsmadeeasy.com/V2.0/dns/managed/7495851"
+      FILE_UPLOADER_HOST: "https://uploader.ma.direct"
+      FILE_UPLOADER_TOKEN: "6c67d6868a6887c4e8fc750c4583a11e1c133f42"
+      AUTHSERV: "https://auth.ma.direct?AUTH_TOKEN=46c59bca001a334dbd7abce8863da5750a7e5e12718080d3d823c290d49a8f01&SERVICE_NAME=stage"
+      AUTHSERV_HOST: "https://auth.ma.direct"
+      AUTHSERV_TOKEN: "46c59bca001a334dbd7abce8863da5750a7e5e12718080d3d823c290d49a8f01"
+      AUTHSERV_SERVICE_NAME: "stage"
+      SERVICE_DOMAIN_SIGN_UP: "https://stage.ma.direct"
+      SERVER_IP: 51.250.30.204
+      CONFLUENCE_WIKI_TOKEN: "DO2woxhGRgX83G-rVK525Q"
+      MA_API_SERVICE_AUTH_TOKEN: "ldjkniu2h9iu2lk1nosi2o3"
+      MA_API_SERVICE_HOST:  "https://api.ma.direct"
+      SERVICE_HOST: "https://stage.ma.direct"
+      NR_SERVICE_HOST: "http://nr_service:8000"
+      NR_SERVICE_AUTH_TOKEN: "Niuh9ud9u3bd02MOIJNON3-0-f23-23nf3n4o3i04in20"
+      KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.nr_service&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+      SERVER_NAME: "MA_DIRECT_STAGE"
+      RATESSERV_HOST: "https://rates-stage.ma.direct"  # remove
+      RATESSERV_TOKEN: "8987ed047f58f9ba3d8bed50724469b6"  # remove
+      RATESSERV: "https://rates-dev.ma.direct?AUTH_TOKEN=8987ed047f58f9ba3d8bed50724469b6"
+      KAFKA_URI: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092"
+      KAFKA_URI_BROADCAST: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.broadcast&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+
+      ANALYTIC_SERVICE: http://analytic:8126/?AUTH_TOKEN=ejnfr9h349rufnw0i34r9hgf1934iGg8
+      ANALYTIC_KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.analytic&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+      - "/opt/saas/prod_static:/opt/static"
+      # - "/opt/saas/env.dev:/opt/saas/env.dev"
+  dev:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/ma-saas-dev:latest
+    restart: on-failure
+    command: >
+      bash -c "./manage.py runserver 0.0.0.0:8100"
+      # bash -c "gunicorn ma_saas.wsgi:application --bind 0.0.0.0:8100"
+    ports:
+      - "127.0.0.1:8100:8100"
+      - "63791:6379"
+    depends_on:
+      - nr_service
+    environment:
+      DEBUG: 1
+      SECRET_KEY: "dvjkashfjdfksagbhvasbvc32424"
+      BASE_URL: "http://dev.ma.direct/"
+      DATABASE_URI_SAAS: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/saas?sslmode=verify-full&sslrootcert=/opt/root.crt
+      DATABASE_URI_BILLING: postgresql://billing:m3EDC=%9hM8X_48fZgPY@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/billing?sslmode=verify-full&sslrootcert=/opt/root.crt
+      DATABASE_URI_HELPDESK: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/helpdesk?sslmode=verify-full&sslrootcert=/opt/root.crt
+      DATABASE_URI_DATA_COURIER: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/data-courier?sslmode=verify-full&sslrootcert=/opt/root.crt
+      REDIS_URI_POLICIES: redis://redis:6379/4 # redis://192.168.1.5:6379/4
+      CELERY_BROKER_URI: redis://redis:6379/5 # redis://192.168.1.5:6379/5
+      CELERY_QUEUE: madirect_backgrounds_dev
+      BILLING_HOST: "billing-dev:9090"
+      MEDIA_STORE: "http://136.243.147.54:10999/?ID_REQUEST_HOST=https://files.ma.direct&MEDIA_SECRET_KEY=0e83c8a58b9c0ba01f875f3d93d54e48&PUBLIC_LINK_SECRET_KEY=e0913df826d9a8560a9d5acacad6602d"
+      SERVER_ENVIRONMENT: "dev"
+      SENTRY_URL: "https://6d83ca3f56a24a88add943b9b4c4257d@sentry.millionagents.com/8"
+      SERVICE_DOMAIN: "dev.ma.direct"
+      REALMROUTERSERV: "https://realmrouterserv.millionagents.com/proceed_request/?AUTH_TOKEN=f642240c77d884ef86a50715748fbadc278f60dc9d7dd23d9b04aba10839baa2"
+
+      LOGGER_SERV_LINK: "http://84.201.142.101/api/v1/log"
+      LOGGER_AUTH_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoxLCJyZWFsbSI6MX0.z3t6x0mSGrG60rQ8-nuFp3CzUP-b6C3PumzwruQ-sVE"
+      # YANDEX_GEOCODER_API_KEY: "22c17acd-f947-4bf6-b5e1-f2074a028453"
+      # YANDEX_GEOCODER_API_KEY: "40c52364-31a1-4c26-a02e-b01613935f08"
+      YANDEX_GEOCODER_API_KEY: "50c23ef6-66ce-4d76-9a1b-2c5a783eb7be"
+      REQUISITES: "https://requisitesdev.millionagents.com?AUTH_TOKEN=3ca3706923c5b4ead7810d36fea31feb32682117"
+      DOCSHUB: "https://docshub.millionagents.com?AUTH_TOKEN=a93ed1be0d921ae432ad0b1f97a91d1ed05a7157"
+      POLICIESSERV: "https://policiesdev.ma.direct?AUTH_TOKEN=fac00e479d7999b8d5927a9485149aff6d7e93e43cc5e6c95506496a25446171"
+      KAFKA_URI: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092"
+      DNS_MADE_EASY: "https://api.dnsmadeeasy.com/V2.0/dns/managed/7495851?API_KEY=90e77278-38c1-4c61-a802-364d8c162852&SECRET_KEY=e7bf6065-a493-4c49-b88f-d4fccb478c29"
+      FILE_UPLOADER: "https://uploader.ma.direct?AUTH_TOKEN=6c67d6868a6887c4e8fc750c4583a11e1c133f42"
+      AUTHSERV: "https://auth.ma.direct?AUTH_TOKEN=46c59bca001a334dbd7abce8863da5750a7e5e12718080d3d823c290d49a8f01&SERVICE_NAME=dev"
+      SERVICE_DOMAIN_SIGN_UP: "https://dev.ma.direct"
+      SERVER_IP: 51.250.30.204
+      WHAT_IS_MA_URL: "https://redirect.appmetrica.yandex.com/serve/820127874299246630"
+      CONFLUENCE_WIKI_TOKEN: "DO2woxhGRgX83G-rVK525Q"
+      MA_API_SERVICE: "https://api.ma.direct?AUTH_TOKEN=ldjkniu2h9iu2lk1nosi2o3"
+      SERVICE_HOST: "https://dev.ma.direct"
+      NR_SERVICE: "http://nr_service:8000?AUTH_TOKEN=Niuh9ud9u3bd02MOIJNON3-0-f23-23nf3n4o3i04in20"
+      KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.nr_service&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"      
+      RATESSERV: "https://rates-dev.ma.direct?AUTH_TOKEN=fbba58eb68f91cf093d992f101fcf16a"
+      TOKEN_FOR_EXTERNAL_SERVICE: "e83c8a58b9c26d9a8560a9d5a0ba01f875f26d9a8560a9d5a"
+      MESSENGER: "https://messenger-dev.ma.direct?AUTH_TOKEN=eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ" 
+      KAFKA_URI_BROADCAST: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.broadcast.dev&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+      KAFKA_URI_DATACOURIER: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic_in=madirect.datacourier.recepient.in&topic_out=madirect.datacourier.recepient.out&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+      BACKGROUND_GRPC_HOST: 51.250.30.204
+      BACKGROUND_GRPC_PORT: 9646
+      GRPC_MICROSERVICE_ON: 1
+
+      ANALYTIC_SERVICE: "http://analytic:8126/?AUTH_TOKEN=ejnfr9h349rufnw0i34r9hgf1934iGg8"
+      ANALYTIC_KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.analytic&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+  tmp:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/ma-saas-tmp:latest
+    restart: on-failure
+    command: >
+      bash -c "./manage.py runserver 0.0.0.0:8100"
+      # bash -c "gunicorn ma_saas.wsgi:application --bind 0.0.0.0:8100"
+    ports:
+      - "127.0.0.1:7100:8100"
+      - "63792:6379"
+    depends_on:
+      - nr_service
+    environment:
+      DEBUG: 1
+      SECRET_KEY: "dvjkashfjdfksagbhvasbvc32424"
+      BASE_URL: "http://dev.ma.direct/"
+
+      DATABASE_URI_SAAS: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/saas?sslmode=verify-full&sslrootcert=/opt/root.crt
+      DATABASE_URI_BILLING: postgresql://billing:m3EDC=%9hM8X_48fZgPY@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/billing?sslmode=verify-full&sslrootcert=/opt/root.crt
+      REDIS_URI_POLICIES: redis://redis:6379/4 # redis://192.168.1.5:6379/4
+      CELERY_BROKER_URI: redis://redis:6379/5 # redis://192.168.1.5:6379/5
+
+      MEDIA_SECRET_KEY: "0e83c8a58b9c0ba01f875f3d93d54e48"
+      BILLING_HOST: "billing-dev:9090"
+      MEDIA_STORE: "http://136.243.147.54:10999"
+      MEDIA_STORE_ID_REQUEST_HOST: "https://files.ma.direct"
+      OBJ_STORE_HOST: "https://files.ma.direct"
+      SERVER_ENVIRONMENT: "dev"
+
+      SENTRY_URL: "https://6d83ca3f56a24a88add943b9b4c4257d@sentry.millionagents.com/8"
+      # SENTRY_URL: "https://841d30eb4c79426ca75d6474f03cd4dc@o482898.ingest.sentry.io/5533816"
+      SERVICE_DOMAIN: "dev.ma.direct"
+
+      REALMROUTERSERV_HOST: "https://realmrouterserv.millionagents.com/proceed_request/"
+      REALMROUTERSERV_AUTH_TOKEN: "f642240c77d884ef86a50715748fbadc278f60dc9d7dd23d9b04aba10839baa2"
+      REALMROUTERSERV: "https://realmrouterserv.millionagents.com/proceed_request/?AUTH_TOKEN=f642240c77d884ef86a50715748fbadc278f60dc9d7dd23d9b04aba10839baa2"
+
+      LOGGER_SERV_LINK: "http://84.201.142.101/api/v1/log"
+      LOGGER_AUTH_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0IjoxLCJyZWFsbSI6MX0.z3t6x0mSGrG60rQ8-nuFp3CzUP-b6C3PumzwruQ-sVE"
+
+      # YANDEX_GEOCODER_API_KEY: "22c17acd-f947-4bf6-b5e1-f2074a028453"
+      # YANDEX_GEOCODER_API_KEY: "40c52364-31a1-4c26-a02e-b01613935f08"
+      YANDEX_GEOCODER_API_KEY: "50c23ef6-66ce-4d76-9a1b-2c5a783eb7be"
+
+      REQUISITES_HOST: "https://requisitesdev.millionagents.com"
+      REQUISITES_AUTH_TOKEN: "3ca3706923c5b4ead7810d36fea31feb32682117"
+      REQUISITES: "https://requisitesdev.millionagents.com?AUTH_TOKEN=3ca3706923c5b4ead7810d36fea31feb32682117"
+
+      DOCSHUB_HOST: "https://docshub.millionagents.com"
+      DOCSHUB_AUTH_TOKEN: "a93ed1be0d921ae432ad0b1f97a91d1ed05a7157"
+      DOCSHUB: "https://docshub.millionagents.com?AUTH_TOKEN=a93ed1be0d921ae432ad0b1f97a91d1ed05a7157"
+
+      POLICIESSERV_HOST: "https://policiesdev.ma.direct"
+      POLICIESSERV_TOKEN: "fac00e479d7999b8d5927a9485149aff6d7e93e43cc5e6c95506496a25446171"
+      POLICIESSERV: "https://policiesdev.ma.direct?AUTH_TOKEN=fac00e479d7999b8d5927a9485149aff6d7e93e43cc5e6c95506496a25446171"
+
+      KAFKA_URI: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092"
+
+      DNSMADEEASY_API_KEY: "90e77278-38c1-4c61-a802-364d8c162852"
+      DNSMADEEASY_SECRET_KEY: "e7bf6065-a493-4c49-b88f-d4fccb478c29"
+      DNSMADEEASY_URL: "https://api.dnsmadeeasy.com/V2.0/dns/managed/7495851"
+      DNS_MADE_EASY: "https://api.dnsmadeeasy.com/V2.0/dns/managed/7495851?API_KEY=90e77278-38c1-4c61-a802-364d8c162852&SECRET_KEY=e7bf6065-a493-4c49-b88f-d4fccb478c29"
+
+      FILE_UPLOADER_HOST: "https://uploader.ma.direct"
+      FILE_UPLOADER_TOKEN: "6c67d6868a6887c4e8fc750c4583a11e1c133f42"
+      FILE_UPLOADER: "https://uploader.ma.direct?AUTH_TOKEN=6c67d6868a6887c4e8fc750c4583a11e1c133f42"
+
+      AUTHSERV_HOST: "https://auth.ma.direct"
+      AUTHSERV_TOKEN: "46c59bca001a334dbd7abce8863da5750a7e5e12718080d3d823c290d49a8f01"
+      AUTHSERV_SERVICE_NAME: "dev"
+      AUTHSERV/: "https://auth.ma.direct?AUTH_TOKEN=46c59bca001a334dbd7abce8863da5750a7e5e12718080d3d823c290d49a8f01&SERVICE_NAME=dev"
+
+      SERVICE_DOMAIN_SIGN_UP: "https://dev.ma.direct"
+      SERVER_IP: 51.250.30.204
+
+      WHAT_IS_MA_URL: "https://redirect.appmetrica.yandex.com/serve/820127874299246630"
+      CONFLUENCE_WIKI_TOKEN: "DO2woxhGRgX83G-rVK525Q"
+
+      MA_API_SERVICE_AUTH_TOKEN: "ldjkniu2h9iu2lk1nosi2o3"
+      MA_API_SERVICE_HOST:  "https://api.ma.direct"
+      MA_API_SERVICE: "https://api.ma.direct?AUTH_TOKEN=ldjkniu2h9iu2lk1nosi2o3"
+
+      SERVICE_HOST: "https://dev.ma.direct"
+
+      NR_SERVICE_HOST: "http://nr_service:8000"
+      NR_SERVICE_AUTH_TOKEN: "Niuh9ud9u3bd02MOIJNON3-0-f23-23nf3n4o3i04in20"
+      NR_SERVICE: "http://nr_service:8000?AUTH_TOKEN=Niuh9ud9u3bd02MOIJNON3-0-f23-23nf3n4o3i04in20"
+
+      KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.nr_service&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+ 
+      RATESSERV_HOST: "https://rates-dev.ma.direct"  # remove
+      RATESSERV_TOKEN: "fbba58eb68f91cf093d992f101fcf16a"  # remove
+      RATESSERV: "https://rates-dev.ma.direct?AUTH_TOKEN=fbba58eb68f91cf093d992f101fcf16a"
+
+      ANALYTIC_SERVICE: "http://analytic:8126/?AUTH_TOKEN=ejnfr9h349rufnw0i34r9hgf1934iGg8"
+      ANALYTIC_KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.analytic&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+
+
+  billing:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/billing:latest
+    ports:
+      - "127.0.0.1:9090:9090"
+    environment:
+      DB_HOST: rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net
+      DB_PORT: 6432
+      DB_NAME: billing-prod
+      DB_USER: saas
+      DB_PASSWORD: rRA8tDYpGRXbL2_MrY=n
+      DB_OPTIONS: "sslmode=verify-full sslrootcert=/opt/root.crt"
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+
+  billing-stage:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/billing:latest
+    ports:
+      - "127.0.0.1:9092:9090"
+    environment:
+      DB_HOST: rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net
+      DB_PORT: 6432
+      DB_NAME: billing-stage
+      DB_USER: saas
+      DB_PASSWORD: rRA8tDYpGRXbL2_MrY=n
+      DB_OPTIONS: "sslmode=verify-full sslrootcert=/opt/root.crt"
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+
+  billing-dev:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/billing:latest
+    ports:
+      - "127.0.0.1:9091:9090"
+    environment:
+      DB_HOST: rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net
+      DB_PORT: 6432
+      DB_NAME: billing
+      DB_USER: billing
+      DB_PASSWORD: m3EDC=%9hM8X_48fZgPY
+      DB_OPTIONS: "sslmode=verify-full sslrootcert=/opt/root.crt"
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+  messenger:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/messenger:latest
+    restart: on-failure
+    ports:
+      - "127.0.0.1:4000:4000"
+      - "127.0.0.1:4001:4000"
+    environment:
+      SECRET_KEY_BASE: PfUHk0zim9kOoAkKnRKmPFOTn/TslI2Yk8Z5ph7SFsxPEGZ2hjMY2aBBJfFB0/PE
+      # KAFKA_HOST: 88.99.31.132
+      # KAFKA_PORT: 8092
+      # KAFKA_USER: ma
+      # KAFKA_PASS: pass
+      HOST: messenger.ma.direct
+      PORT: 4000
+      PG_USER: saas
+      PG_PASS: rRA8tDYpGRXbL2_MrY=n
+      PG_DATABASE: messenger-prod
+      PG_HOSTNAME: rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net
+      PG_PORT: 6432
+      PG_CERT: /opt/root.crt
+      APP_TOKEN: eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
+      PG_SSL: 1
+      MIX_ENV: prod
+      SUPERUSER_TOKEN: M0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwia
+      MADIRECT_HOST: https://prod.ma.direct
+      MADIRECT_TOKEN: e83c8a58b9c26d9a8560a9d5a0ba01f875f26d9a8560a9d5a
+    volumes:
+      - "/opt/root.crt:/opt/root.crt"
+
+  policies-prod:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/policies-prod:latest
+    command: >
+      bash -c "gunicorn --workers=4 policiesserv.asgi:app --bind 0.0.0.0:8124 -k uvicorn.workers.UvicornWorker"
+    ports:
+      - "127.0.0.1:8102:8124"
+    volumes:
+      - "/opt/policiesserv/settings-prod.ini:/usr/src/policiesserv/settings.ini"
+      - "/opt/policiesserv/static:/usr/src/policiesserv/static"
+      - "/opt/root.crt:/opt/root.crt"
+    environment:
+      DATABASE_URI: "postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/policies-prod?sslmode=verify-full&sslrootcert=/opt/root.crt"
+      KAFKA_URI: kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092
+      REDIS_URI: redis://redis:6379/0 # redis://192.168.1.5:6379/0
+  policies-stage:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/policies-prod:latest
+    command: >
+      bash -c "gunicorn --workers=4 policiesserv.asgi:app --bind 0.0.0.0:8124 -k uvicorn.workers.UvicornWorker"
+    ports:
+      - "127.0.0.1:8114:8124"
+    volumes:
+      - "/opt/policiesserv/settings-stage.ini:/usr/src/policiesserv/settings.ini"
+      - "/opt/policiesserv/static:/usr/src/policiesserv/static"
+      - "/opt/root.crt:/opt/root.crt"
+    environment:
+      DATABASE_URI: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/policies-stage?sslmode=verify-full&sslrootcert=/opt/root.crt
+      KAFKA_URI: kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092
+      REDIS_URI: redis://redis:6379/2 # redis://192.168.1.5:6379/2
+  policies-dev:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/policies-dev:latest
+    command: >
+      bash -c "gunicorn --workers=4 policiesserv.asgi:app --bind 0.0.0.0:8124 -k uvicorn.workers.UvicornWorker"
+    ports:
+      - "127.0.0.1:8101:8124"
+    volumes:
+      - "/opt/policiesserv/settings-dev.ini:/usr/src/policiesserv/settings.ini"
+      - "/opt/policiesserv/static:/usr/src/policiesserv/static"
+      - "/opt/root.crt:/opt/root.crt"
+    environment:
+      DATABASE_URI: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/policiesserv?sslmode=verify-full&sslrootcert=/opt/root.crt
+      KAFKA_URI: kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092
+      REDIS_URI: redis://redis:6379/4 # redis://192.168.1.5:6379/4 
+  auth:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/instance_auth:latest
+    command: >
+      bash -c "gunicorn --workers=4 main.asgi:app --bind 0.0.0.0:8000 -k uvicorn.workers.UvicornWorker"
+    ports:
+      - "127.0.0.1:8110:8000"
+    volumes:
+      - "/opt/auth/settings.ini:/usr/src/instance_auth/settings.ini"
+      - "/opt/auth/static:/usr/src/instance_auth/static"
+      - "/opt/root.crt:/opt/root.crt"
+
+  file_uploader:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/file_uploader-master:latest
+    command: >
+      bash -c "gunicorn -c gunicorn_config.py -k uvicorn.workers.UvicornWorker --preload main:app --bind 0.0.0.0:8000"
+    ports:
+      - "8111:8000"
+    volumes:
+      - "/opt/file_uploader/settings.ini:/usr/src/file_uploader/settings.ini"
+      - "/opt/file_uploader/static:/usr/src/file_uploader/static"
+      - "/opt/file_uploader/tmp:/usr/src/file_uploader/app/tmp"
+      - "/opt/root.crt:/opt/root.crt"
+    environment:
+      DATABASE_URI: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/fileuploader_db?sslrootcert=/opt/root.crt
+      CERT_PATH: /opt/root.crt
+      REDIS_URI: redis://redis:6379/6 # redis://192.168.1.5:6379/6
+  kassa:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/kassa:latest
+    command: >
+      bash -c "gunicorn --workers=5 --threads=2 api:app --bind 0.0.0.0:8000 -k uvicorn.workers.UvicornWorker"
+    ports:
+      - "127.0.0.1:8112:8000"
+    volumes:
+      - "/opt/kassa/settings.ini:/usr/src/kassa/settings.ini"
+      - "/opt/kassa/certs:/usr/src/kassa/certs"
+      - "/opt/root.crt:/usr/src/kassa/root.crt"
+      - "/opt/kassa/static:/usr/src/kassa/static"
+      - "/opt/kassa/vendor:/usr/src/kassa/vendor"
+  mailcheck:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/mailcheck_service-image:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8115:8000"
+    volumes:
+      - "/opt/mailcheck/settings.ini:/usr/src/mailcheck/settings.ini"
+      - "/opt/root.crt:/opt/root.crt"
+    environment:
+      REDIS_URI: redis://redis:6379/7 # redis://192.168.1.5:6379/7
+      CELERY_BROKER_URI: redis://redis:6379/8 # redis://192.168.1.5:6379/8
+
+  treasury-dev:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/treasury:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8116:8000"
+    volumes:
+      - "/opt/treasury/settings-dev.ini:/usr/src/treasury/settings.ini"
+      - "/opt/root.crt:/usr/src/treasury/root.crt"
+    environment:
+      - CELERY_QUEUE=treasury_dev
+
+  ma_api:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/ma_api_service:latest
+    restart: on-failure  
+    command: >
+      bash -c "python manage.py collectstatic --noinput &&
+               python manage.py migrate &&
+               uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8317:8000"
+    volumes:
+      - "/opt/ma_api_service/static:/usr/src/ma_api_service/static"
+      - "/opt/root.crt:/opt/root.crt"
+      - "/opt/ma_api_service:/opt/ma_api_service"
+    environment:
+       DATABASE_URI: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/ma_api_service?sslmode=verify-full&sslrootcert=/opt/root.crt
+       REDIS_URI: redis://redis:6379/9 # redis://192.168.1.5:6379/9
+       MA_API_SERVICE_AUTH_TOKEN: "ldjkniu2h9iu2lk1nosi2o3"
+       SENTRY_URL: "https://07514c088d6c4e8e867fbf3ff334ae77@sentry.millionagents.com/9"
+       LOGGING_FILE_PATH: "/opt/ma_api_service/logging.log"
+       SERVER_NAME: "MA_API_SERVICE_DEV"
+
+  treasury-stage:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/treasury:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8118:8000"
+    volumes:
+      - "/opt/treasury/settings-stage.ini:/usr/src/treasury/settings.ini"
+      - "/opt/root.crt:/usr/src/treasury/root.crt"
+    environment:
+      - CELERY_QUEUE=treasury_stage
+
+  rates-dev:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/rates:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8119:8000"
+    volumes:
+      - "/opt/rates/settings-dev.ini:/usr/src/rates/settings.ini"
+      - "/opt/root.crt:/usr/src/rates/root.crt"
+    environment:
+      - CELERY_QUEUE=rates_dev
+
+  nr_service:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/nr_service:latest
+    restart: on-failure
+    command: >
+      bash -c "python manage.py collectstatic --noinput &&
+               python manage.py migrate &&
+               uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8120:8000"
+    volumes:
+      - "/opt/nr_service/static:/usr/src/nr_service/static"
+      - "/opt/root.crt:/opt/root.crt"
+      - "/opt/nr_service:/opt/nr_service"
+    environment:
+        DATABASE_URI: "postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/nrserv?sslmode=verify-full&sslrootcert=/opt/root.crt"
+        DJANGO_ALLOWED_HOSTS: "*"
+        KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.nr_service&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+        NR_SERVICE_AUTH_TOKEN: "Niuh9ud9u3bd02MOIJNON3-0-f23-23nf3n4o3i04in20"
+        SERVER_NAME: "NR_SERVICE_DEV"
+        REALMROUTERSERV_LINK: "https://realmrouterserv.millionagents.com/proceed_request/?trust_token=f642240c77d884ef86a50715748fbadc278f60dc9d7dd23d9b04aba10839baa2"
+        REALM_ID: 1
+
+  treasury-prod:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/treasury:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8121:8000"
+    volumes:
+      - "/opt/treasury/settings-prod.ini:/usr/src/treasury/settings.ini"
+      - "/opt/root.crt:/usr/src/treasury/root.crt"
+    environment:
+      - CELERY_QUEUE=treasury_prod
+
+  rates-stage:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/rates:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8122:8000"
+    volumes:
+      - "/opt/rates/settings-stage.ini:/usr/src/rates/settings.ini"
+      - "/opt/root.crt:/usr/src/rates/root.crt"
+    environment:
+      - CELERY_QUEUE=rates_prod
+
+  rates-prod:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/rates:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8123:8000"
+    volumes:
+      - "/opt/rates/settings-prod.ini:/usr/src/rates/settings.ini"
+      - "/opt/root.crt:/usr/src/rates/root.crt"
+    environment:
+      - CELERY_QUEUE=rates_prod
+
+  helpdesk-dev:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/helpdesk:latest
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8000"
+    ports:
+      - "8124:8000"
+    volumes:
+      - "/opt/helpdesk/settings-dev.ini:/usr/src/helpdesk/settings.ini"
+      - "/opt/root.crt:/usr/src/helpdesk/root.crt"
+  
+  broadcastserv:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/broadcastserv:latest
+    restart: on-failure
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8011"
+    ports:
+      - "8011:8011"
+    volumes:
+      - "/opt/root.crt:/usr/src/broadcastserv/root.crt"
+    environment:
+        SENTRY_URL: https://07514c088d6c4e8e867fbf3ff334ae77@sentry.millionagents.com/9
+        SERVER_ENVIRONMENT: common
+        BROADCAST_REDIS_URI: redis://redis:6379/10
+        TRUST_TOKEN: lwkefo9i24309t5i23g5n024i50nfri0234
+        POLICY_REDIS_URI: redis://redis:6379/4
+        DEBUG: 1
+        KAFKA_URI_BROADCAST: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.broadcast&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+  websocketserv:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/websocketserv:latest
+    restart: on-failure
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8012"
+    ports:
+      - "8012:8012"
+    depends_on:
+        - broadcastserv
+    volumes:
+      - "/opt/root.crt:/usr/src/websocketserv/root.crt"
+    environment:
+        SENTRY_URL: https://07514c088d6c4e8e867fbf3ff334ae77@sentry.millionagents.com/9
+        SERVER_ENVIRONMENT: common
+        BROADCAST_REDIS_URI_DEV: redis://redis:6379/10
+        BROADCAST_SERVICE_LINK: http://broadcastserv:8011?TRUST_TOKEN=lwkefo9i24309t5i23g5n024i50nfri0234
+        DEBUG: 1
+        BROADCAST_REDIS_URI_STAGE: redis://redis:6379/2 # redis://192.168.1.5:6379/2
+        BROADCAST_REDIS_URI_PROD: redis://redis:6379/??? # redis://192.168.1.5:6379/2
+
+  file_uploader2:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/file_uploader-master:latest
+    command: >
+      bash -c "gunicorn -c gunicorn_config.py -k uvicorn.workers.UvicornWorker --preload main:app --bind 0.0.0.0:8000"
+    ports:
+      - "8125:8000"
+    volumes:
+      - "/opt/file_uploader/settings2.ini:/usr/src/file_uploader/settings.ini"
+      - "/opt/file_uploader/static:/usr/src/file_uploader/static"
+      - "/opt/file_uploader/tmp:/usr/src/file_uploader/app/tmp"
+      - "/opt/root.crt:/opt/root.crt"
+    environment:
+      DATABASE_URI: postgresql://saas:rRA8tDYpGRXbL2_MrY=n@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/fileuploader_db?sslrootcert=/opt/root.crt
+      CERT_PATH: /opt/root.crt
+      REDIS_URI: redis://redis:6379/6
+
+  analytic:
+    image: cr.yandex/crp410gd0ii2flvgdi8s/analytic:latest
+    restart: on-failure
+    command: >
+      bash -c "uvicorn main.asgi:app --proxy-headers --host 0.0.0.0 --port 8126"
+    ports:
+      - "8126:8126"
+    volumes:
+      - "/opt/root.crt:/usr/src/broadcastserv/root.crt"
+    environment:
+        SERVER_ENVIRONMENT: common
+        ANALYTIC_SERVICE_TRUST_TOKEN: ejnfr9h349rufnw0i34r9hgf1934iGg8
+        DATABASE_URI: postgresql://analytic:smw-AWX-TuR-BQe@rc1b-7fv0mtbjmflm5igt.mdb.yandexcloud.net:6432/analytic?sslrootcert=/opt/root.crt
+        CLICKHOUSE_URI: tcp://analytic:fUA-C7w-MiG-537@rc1a-af09c09663r0b1ie.mdb.yandexcloud.net:8443/analytic
+        SECRET_KEY: ufryg9hwi34nroif0w489h5f98w45mldsnfu93h043fr
+        ANALYTIC_KAFKA_URI_MODEL_SIGNAL: "kafka://ma:MH38iGXq7pcMCUf@kafka.ma.works:8092?topic=madirect.analytic&sasl_mechanism=PLAIN&security_protocol=SASL_PLAINTEXT"
+        DEBUG: 1

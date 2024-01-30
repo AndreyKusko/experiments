@@ -86,15 +86,18 @@ connect to postgres
     find / -name "postgresql.conf"
 
     /etc/postgresql/14/main/postgresql.conf
+    /etc/postgresql/13/main/postgresql.conf
     set falue 
     listen_addresses = '*'          # what IP address(es) to listen on;
     
     nano /etc/postgresql/14/main/pg_hba.conf
+    nano /etc/postgresql/13/main/pg_hba.conf
     host    all             all             0.0.0.0/0               md5
     host    all             all             127.0.0.1/16            scram-sha-256
     
     
-    sudo service postgresql restart
+[//]: # (    sudo service postgresql restart)
+[//]: # (    sudo systemctl restart postgresql)
     systemctl restart postgresql
     systemctl restart postgresql-9.3
     /etc/init.d/postgresql restart
