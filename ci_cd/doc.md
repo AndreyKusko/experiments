@@ -7,6 +7,7 @@ https://habr.com/ru/companies/gitlab/articles/646579/
 уот тут очень хорошая инструкция
 
 https://www.digitalocean.com/community/tutorials/how-to-set-up-a-continuous-deployment-pipeline-with-gitlab-ci-cd-on-ubuntu-18-04
+https://stackoverflow.com/questions/50983177/how-to-connect-to-postgresql-using-docker-compose
 
 
 docker2
@@ -85,17 +86,27 @@ connect to postgres
     
     find / -name "postgresql.conf"
 
-    /etc/postgresql/14/main/postgresql.conf
-    /etc/postgresql/13/main/postgresql.conf
-    set falue 
+    nano /etc/postgresql/14/main/postgresql.conf
+    nano /etc/postgresql/13/main/postgresql.conf
+
+откроет доступ к потгресу наружу
+https://stackoverflow.com/questions/31249112/allow-docker-container-to-connect-to-a-local-host-postgres-database
+
     listen_addresses = '*'          # what IP address(es) to listen on;
-    
+
+откроет доступ к постгресу для докера, установи пароль чтобы не дать всем подряд иметь доступ
+
+    listen_addresses = 'localhost, 172.17.0.1'              # what IP address(es) to listen on;
+
+добавить пароль
     nano /etc/postgresql/14/main/pg_hba.conf
     nano /etc/postgresql/13/main/pg_hba.conf
+    nano /etc/postgresql/16/main/pg_hba.conf
+
     host    all             all             0.0.0.0/0               md5
     host    all             all             127.0.0.1/16            scram-sha-256
-    
-    
+
+
 [//]: # (    sudo service postgresql restart)
 [//]: # (    sudo systemctl restart postgresql)
     systemctl restart postgresql
