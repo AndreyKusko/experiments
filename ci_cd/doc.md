@@ -1,8 +1,5 @@
 # CI/CD / CI CD
 
-сделать пайплайны быстрее
-https://habr.com/ru/companies/gitlab/articles/646579/
-
 
 уот тут очень хорошая инструкция
 
@@ -84,10 +81,16 @@ nginx
 
 connect to postgres
     
+
+    ALTER ROLE postgres WITH PASSWORD 'postgres';
+
+
     find / -name "postgresql.conf"
 
     nano /etc/postgresql/14/main/postgresql.conf
     nano /etc/postgresql/13/main/postgresql.conf
+    nano /etc/postgresql/16/main/postgresql.conf
+
 
 откроет доступ к потгресу наружу
 https://stackoverflow.com/questions/31249112/allow-docker-container-to-connect-to-a-local-host-postgres-database
@@ -99,17 +102,23 @@ https://stackoverflow.com/questions/31249112/allow-docker-container-to-connect-t
     listen_addresses = 'localhost, 172.17.0.1'              # what IP address(es) to listen on;
 
 добавить пароль
+    find / -name "pg_hba.conf"
     nano /etc/postgresql/14/main/pg_hba.conf
     nano /etc/postgresql/13/main/pg_hba.conf
     nano /etc/postgresql/16/main/pg_hba.conf
 
     host    all             all             0.0.0.0/0               md5
+    host    all             all             127.0.0.1/16            md5
+
+    host    all             all             0.0.0.0/0               md5
     host    all             all             127.0.0.1/16            scram-sha-256
 
-
+    service postgresql status
 [//]: # (    sudo service postgresql restart)
-[//]: # (    sudo systemctl restart postgresql)
-    systemctl restart postgresql
+    sudo systemctl restart postgresql
+
+    cat /var/log/postgresql/postgresql-16-main.log
+
     systemctl restart postgresql-9.3
     /etc/init.d/postgresql restart
 
